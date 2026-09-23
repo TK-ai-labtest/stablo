@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cx } from "@/utils/all";
-import { urlForImage } from "@/lib/sanity/image";
 import { parseISO, format } from "date-fns";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import CategoryLabel from "@/components/blog/category";
@@ -15,12 +14,10 @@ export default function PostList({
   fontSize,
   fontWeight
 }) {
-  const imageProps = post?.mainImage
-    ? urlForImage(post.mainImage)
-    : null;
-  const AuthorimageProps = post?.author?.image
-    ? urlForImage(post.author.image)
-    : null;
+  // ดึง URL รูปภาพจาก Mock Data โดยตรง ไม่ต้องพึ่งพา urlForImage จาก Sanity
+  const imageUrl = post?.mainImage?.asset?.url || post?.mainImage;
+  const authorImageUrl = post?.author?.image?.asset?.url || post?.author?.image;
+
   return (
     <>
       <div
@@ -30,7 +27,7 @@ export default function PostList({
         )}>
         <div
           className={cx(
-            " overflow-hidden rounded-md bg-gray-100 transition-all hover:scale-105   dark:bg-gray-800"
+            "overflow-hidden rounded-md bg-gray-100 transition-all hover:scale-105 dark:bg-gray-800"
           )}>
           <Link
             className={cx(
@@ -42,16 +39,12 @@ export default function PostList({
                 : "aspect-square"
             )}
             href={`/post/${pathPrefix ? `${pathPrefix}/` : ""}${
-              post.slug.current
+              post?.slug?.current || ""
             }`}>
-            {imageProps ? (
+            {imageUrl ? (
               <Image
-                src={imageProps.src}
-                {...(post.mainImage.blurDataURL && {
-                  placeholder: "blur",
-                  blurDataURL: post.mainImage.blurDataURL
-                })}
-                alt={post.mainImage.alt || "Thumbnail"}
+                src={imageUrl}
+                alt={post?.title || "Thumbnail"}
                 priority={preloadImage ? true : false}
                 className="object-cover transition-all"
                 fill
@@ -68,7 +61,7 @@ export default function PostList({
         <div className={cx(minimal && "flex items-center")}>
           <div>
             <CategoryLabel
-              categories={post.categories}
+              categories={post?.categories}
               nomargin={minimal}
             />
             <h2
@@ -79,13 +72,13 @@ export default function PostList({
                   ? "text-3xl"
                   : "text-lg",
                 fontWeight === "normal"
-                  ? "line-clamp-2 font-medium  tracking-normal text-black"
+                  ? "line-clamp-2 font-medium tracking-normal text-black"
                   : "font-semibold leading-snug tracking-tight",
-                "mt-2    dark:text-white"
+                "mt-2 dark:text-white"
               )}>
               <Link
                 href={`/post/${pathPrefix ? `${pathPrefix}/` : ""}${
-                  post.slug.current
+                  post?.slug?.current || ""
                 }`}>
                 <span
                   className="bg-gradient-to-r from-green-200 to-green-100 bg-[length:0px_10px] bg-left-bottom
@@ -95,53 +88,50 @@ export default function PostList({
       hover:bg-[length:100%_3px]
       group-hover:bg-[length:100%_10px]
       dark:from-purple-800 dark:to-purple-900">
-                  {post.title}
+                  {post?.title}
                 </span>
               </Link>
             </h2>
 
             <div className="hidden">
-              {post.excerpt && (
+              {post?.excerpt && (
                 <p className="mt-2 line-clamp-3 text-sm text-gray-500 dark:text-gray-400">
                   <Link
                     href={`/post/${
                       pathPrefix ? `${pathPrefix}/` : ""
-                    }${post.slug.current}`}>
-                    {post.excerpt}
+                    }${post?.slug?.current || ""}`}>
+                    {post?.excerpt}
                   </Link>
                 </p>
               )}
             </div>
 
             <div className="mt-3 flex items-center space-x-3 text-gray-500 dark:text-gray-400">
-              <Link href={`/author/${post?.author?.slug?.current}`}>
-                <div className="flex items-center gap-3">
-                  <div className="relative h-5 w-5 flex-shrink-0">
-                    {post?.author?.image && (
-                      <Image
-                        src={AuthorimageProps.src}
-                        alt={post?.author?.name}
-                        className="rounded-full object-cover"
-                        fill
-                        sizes="20px"
-                      />
-                    )}
-                  </div>
-                  <span className="truncate text-sm">
-                    {post?.author?.name}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className="relative h-5 w-5 flex-shrink-0">
+                  {authorImageUrl && (
+                    <Image
+                      src={authorImageUrl}
+                      alt={post?.author?.name || "Author"}
+                      className="rounded-full object-cover"
+                      fill
+                      sizes="20px"
+                    />
+                  )}
                 </div>
-              </Link>
+                <span className="truncate text-sm">
+                  {post?.author?.name}
+                </span>
+              </div>
               <span className="text-xs text-gray-300 dark:text-gray-600">
                 &bull;
               </span>
               <time
                 className="truncate text-sm"
-                dateTime={post?.publishedAt || post._createdAt}>
-                {format(
-                  parseISO(post?.publishedAt || post._createdAt),
-                  "MMMM dd, yyyy"
-                )}
+                dateTime={post?.publishedAt || post?._createdAt}>
+                {post?.publishedAt
+                  ? format(parseISO(post.publishedAt), "MMMM dd, yyyy")
+                  : "Recently"}
               </time>
             </div>
           </div>
