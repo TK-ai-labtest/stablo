@@ -4,11 +4,15 @@ import { Fragment } from "react";
 import { Menu, Transition, Disclosure } from "@headlessui/react";
 import Container from "@/components/container";
 import Link from "next/link";
-import Image from "next/image";
-import { urlForImage } from "@/lib/sanity/image";
 import cx from "clsx";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import { myLoader } from "@/utils/all";
+import { Caveat } from "next/font/google";
+
+// ติดตั้งฟอนต์ลายมือหวัด (Cursive / Brush Script)
+const handwritingFont = Caveat({
+  subsets: ["latin"],
+  weight: ["700"],
+});
 
 export default function Navbar(props) {
   const leftmenu = [
@@ -75,38 +79,19 @@ export default function Navbar(props) {
                     </Fragment>
                   ))}
                 </div>
+
+                {/* ส่วนโลโก้ตรงกลาง: ปรับเป็นชื่อ Nitikarn ฟอนต์ลายมือหวัด Caveat */}
                 <div className="flex w-full items-center justify-between md:w-auto">
-                  <Link href="/" className="w-28 dark:hidden">
-                    {props.logo ? (
-                      <Image
-                        {...urlForImage(props.logo)}
-                        alt="Logo"
-                        priority={true}
-                        sizes="(max-width: 640px) 100vw, 200px"
-                      />
-                    ) : (
-                      <span className="block text-center">
-                        Stablo
-                      </span>
-                    )}
+                  <Link href="/" className="flex items-center justify-center">
+                    <span
+                      className={`${handwritingFont.className} text-3xl md:text-4xl font-bold tracking-wide text-gray-900 dark:text-white transition-colors duration-200`}>
+                      Nitikarn
+                    </span>
                   </Link>
-                  <Link href="/" className="hidden w-28 dark:block">
-                    {props.logoalt ? (
-                      <Image
-                        {...urlForImage(props.logoalt)}
-                        alt="Logo"
-                        priority={true}
-                        sizes="(max-width: 640px) 100vw, 200px"
-                      />
-                    ) : (
-                      <span className="block text-center">
-                        Stablo
-                      </span>
-                    )}
-                  </Link>
+
                   <Disclosure.Button
                     aria-label="Toggle Menu"
-                    className="ml-auto rounded-md px-2 py-1 text-gray-500 focus:text-blue-500 focus:outline-none dark:text-gray-300 md:hidden ">
+                    className="ml-auto rounded-md px-2 py-1 text-gray-500 focus:text-blue-500 focus:outline-none dark:text-gray-300 md:hidden">
                     <svg
                       className="h-6 w-6 fill-current"
                       xmlns="http://www.w3.org/2000/svg"
@@ -121,6 +106,7 @@ export default function Navbar(props) {
                       {!open && (
                         <path
                           fillRule="evenodd"
+                          clipRule="evenodd"
                           d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
                         />
                       )}
@@ -146,7 +132,7 @@ export default function Navbar(props) {
                           rel={item.external ? "noopener" : ""}>
                           <span> {item.label}</span>
                           {item.badge && (
-                            <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-600 dark:bg-cyan-200 dark:text-blue-800 ">
+                            <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-600 dark:bg-cyan-200 dark:text-blue-800">
                               {item.badge}
                             </span>
                           )}
@@ -156,6 +142,7 @@ export default function Navbar(props) {
                   ))}
                 </div>
               </div>
+
               <Disclosure.Panel>
                 <div className="order-2 -ml-4 mt-4 flex w-full flex-col items-center justify-start md:hidden">
                   {mobilemenu.map((item, index) => (
@@ -198,11 +185,11 @@ const DropdownMenu = ({ menu, items, mobile }) => {
         <>
           <Menu.Button
             className={cx(
-              "flex items-center gap-x-1 rounded-md px-5 py-2 text-sm font-medium  outline-none transition-all focus:outline-none focus-visible:text-indigo-500 focus-visible:ring-1 dark:focus-visible:bg-gray-800",
+              "flex items-center gap-x-1 rounded-md px-5 py-2 text-sm font-medium outline-none transition-all focus:outline-none focus-visible:text-indigo-500 focus-visible:ring-1 dark:focus-visible:bg-gray-800",
               open
                 ? "text-blue-500 hover:text-blue-500"
-                : " text-gray-600 dark:text-gray-400 ",
-              mobile ? "w-full px-4 py-2 " : "inline-block px-4 py-2"
+                : "text-gray-600 dark:text-gray-400",
+              mobile ? "w-full px-4 py-2" : "inline-block px-4 py-2"
             )}>
             <span>{menu.label}</span>
             <ChevronDownIcon className="mt-0.5 h-4 w-4" />
@@ -217,8 +204,8 @@ const DropdownMenu = ({ menu, items, mobile }) => {
             leaveTo="lg:transform lg:opacity-0 lg:scale-95">
             <Menu.Items
               className={cx(
-                "z-20 origin-top-left rounded-md  focus:outline-none  lg:absolute lg:left-0  lg:w-56",
-                !mobile && "bg-white shadow-lg  dark:bg-gray-800"
+                "z-20 origin-top-left rounded-md focus:outline-none lg:absolute lg:left-0 lg:w-56",
+                !mobile && "bg-white shadow-lg dark:bg-gray-800"
               )}>
               <div className={cx(!mobile && "py-3")}>
                 {items.map((item, index) => (
