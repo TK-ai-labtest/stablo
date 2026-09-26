@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,7 +12,7 @@ const authorData = {
   avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
 };
 
-// 2. รายการบทความ (ปรับ post-1 เป็นคดีมันสำปะหลัง ส่วน post-2 และ 3 คงไว้เป็นตัวอย่าง)
+// 2. รายการบทความ (Mock Posts)
 const archivePosts = [
   {
     _id: "post-1",
@@ -44,10 +47,22 @@ const archivePosts = [
 ];
 
 export default function ArchivePage() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // กรองบทความตามคำค้นหาแบบ Real-time
+  const filteredPosts = archivePosts.filter((post) => {
+    const query = searchQuery.toLowerCase().trim();
+    return (
+      post.title.toLowerCase().includes(query) ||
+      post.category.toLowerCase().includes(query) ||
+      post.excerpt.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="container px-8 mx-auto xl:px-5 max-w-screen-lg py-10">
       {/* ส่วนหัว: ข้อมูลผู้เขียน (Author Profile) */}
-      <div className="flex flex-col items-center text-center mb-14">
+      <div className="flex flex-col items-center text-center mb-10">
         <div className="relative w-28 h-28 mb-4 overflow-hidden rounded-full ring-4 ring-gray-100 dark:ring-gray-800">
           <Image
             src={authorData.avatar}
@@ -67,39 +82,75 @@ export default function ArchivePage() {
         </p>
       </div>
 
-      {/* ส่วนตะแกรงบทความ: 3 คอลัมน์ */}
-      <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-        {archivePosts.map((post) => (
-          <article key={post._id} className="flex flex-col group">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4">
-              <Image
-                src={post.image}
-                alt={post.title}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+      {/* ส่วนกล่องค้นหา (Search Box) */}
+      <div className="max-w-md mx-auto mb-14">
+        <div className="relative flex items-center">
+          <input
+            type="text"
+            placeholder="ค้นหาเคสคดี, ภาษี, สัญญา, กระแสเงินสด..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-5 py-3 pr-11 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white transition-all shadow-sm"
+          />
+          <div className="absolute right-4 text-gray-400 pointer-events-none">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
-            </div>
-            
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`text-[11px] font-bold uppercase tracking-wider ${post.categoryColor}`}>
-                {post.category}
-              </span>
-              <span className="text-xs text-gray-300 dark:text-gray-600">•</span>
-              <span className="text-xs text-gray-400">{post.publishedAt}</span>
-            </div>
-
-            <h2 className="text-lg font-semibold leading-snug text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
-              {post.title}
-            </h2>
-
-            {post.excerpt && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
-                {post.excerpt}
-              </p>
-            )}
-          </article>
-        ))}
+            </svg>
+          </div>
+        </div>
       </div>
+
+      {/* ส่วนตะแกรงบทความ: 3 คอลัมน์ (ปรับเปลี่ยนตามคำค้นหา) */}
+      {filteredPosts.length > 0 ? (
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPosts.map((post) => (
+            <article key={post._id} className="flex flex-col group">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${post.categoryColor}`}>
+                  {post.category}
+                </span>
+                <span className="text-xs text-gray-300 dark:text-gray-600">•</span>
+                <span className="text-xs text-gray-400">{post.publishedAt}</span>
+              </div>
+
+              <h2 className="text-lg font-semibold leading-snug text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
+                {post.title}
+              </h2>
+
+              {post.excerpt && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                  {post.excerpt}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <p className="text-gray-500 dark:text-gray-400 text-base">
+            ไม่พบบทความหรือเคสที่ตรงกับคำค้นหา &quot;{searchQuery}&quot;
+          </p>
+        </div>
+      )}
     </div>
   );
 }
