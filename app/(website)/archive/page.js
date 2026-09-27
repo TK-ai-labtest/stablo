@@ -113,9 +113,11 @@ export default function ArchivePage() {
       {/* ส่วนตะแกรงบทความ: 3 คอลัมน์ (ปรับเปลี่ยนตามคำค้นหา) */}
       {filteredPosts.length > 0 ? (
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-          {filteredPosts.map((post) => (
-            <article key={post._id} className="flex flex-col group">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4">
+{filteredPosts.map((post) => (
+          <article key={post._id} className="flex flex-col group">
+            {/* ครอบรูปภาพด้วย Link ให้กดคลิกได้ */}
+            <Link href={`/post/${post.slug}`} className="block">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4 cursor-pointer">
                 <Image
                   src={post.image}
                   alt={post.title}
@@ -123,26 +125,30 @@ export default function ArchivePage() {
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`text-[11px] font-bold uppercase tracking-wider ${post.categoryColor}`}>
-                  {post.category}
-                </span>
-                <span className="text-xs text-gray-300 dark:text-gray-600">•</span>
-                <span className="text-xs text-gray-400">{post.publishedAt}</span>
-              </div>
+            </Link>
+            
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-[11px] font-bold uppercase tracking-wider ${post.categoryColor}`}>
+                {post.category}
+              </span>
+              <span className="text-xs text-gray-300 dark:text-gray-600">•</span>
+              <span className="text-xs text-gray-400">{post.publishedAt}</span>
+            </div>
 
-              <h2 className="text-lg font-semibold leading-snug text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
+            {/* ครอบชื่อเรื่องด้วย Link ให้กดคลิกได้ */}
+            <Link href={`/post/${post.slug}`} className="block">
+              <h2 className="text-lg font-semibold leading-snug text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2 cursor-pointer">
                 {post.title}
               </h2>
+            </Link>
 
-              {post.excerpt && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
-                  {post.excerpt}
-                </p>
-              )}
-            </article>
-          ))}
+            {post.excerpt && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                {post.excerpt}
+              </p>
+            )}
+          </article>
+        ))}
         </div>
       ) : (
         <div className="text-center py-16">
